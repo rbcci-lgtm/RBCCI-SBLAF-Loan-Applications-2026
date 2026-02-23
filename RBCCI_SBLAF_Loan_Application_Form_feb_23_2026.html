@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RBCCI - SBLAF Loan Application Form (RBL006)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Merriweather:wght@400;700&display=swap');
+
+  :root {
+    --pine: #1a6b3c;
+    --pine-dark: #0e4d28;
+    --pine-light: #e8f5ee;
+    --pine-mid: #b8dfc8;
+    --gold: #c8a84e;
+    --gold-light: #f5efd8;
+    --bg: #f7f8f6;
+    --text: #1e2a1e;
+    --text-light: #5a6b5a;
+    --border: #c4d4c4;
+    --white: #ffffff;
+    --danger: #c0392b;
+    --row-alt: #f0f7f2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Libre Franklin', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, var(--pine-dark) 0%, var(--pine) 60%, #2a8b52 100%);
+    color: white;
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 3px 16px rgba(0,0,0,0.18);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .app-header .logo-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .app-header .logo-circle {
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    font-size: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    letter-spacing: -0.5px;
+  }
+
+  .app-header h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .app-header .subtitle {
+    font-size: 11px;
+    opacity: 0.8;
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Libre Franklin', sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-excel {
+    background: #217346;
+    color: white;
+  }
+  .btn-excel:hover { background: #1a5c38; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(33,115,70,0.3); }
+
+  .btn-pdf {
+    background: var(--danger);
+    color: white;
+  }
+  .btn-pdf:hover { background: #a93226; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(192,57,43,0.3); }
+
+  .btn-clear {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .btn-clear:hover { background: rgba(255,255,255,0.25); }
+
+  .btn-print {
+    background: var(--gold);
+    color: var(--pine-dark);
+  }
+  .btn-print:hover { background: #b89a42; transform: translateY(-1px); }
+
+  .btn-sheets {
+    background: #0f9d58;
+    color: white;
+  }
+  .btn-sheets:hover { background: #0b8043; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(15,157,88,0.3); }
+  .btn-sheets.loading { opacity: 0.7; pointer-events: none; }
+
+  .btn svg { width: 15px; height: 15px; }
+
+  .form-container {
+    max-width: 1050px;
+    margin: 24px auto;
+    padding: 0 20px 60px;
+  }
+
+  .form-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 0 4px;
+  }
+
+  .form-code {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--pine);
+  }
+
+  .form-rev {
+    font-size: 11px;
+    color: var(--text-light);
+  }
+
+  .form-card {
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .section-header {
+    background: linear-gradient(90deg, var(--pine) 0%, var(--pine-dark) 100%);
+    color: white;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-header .badge {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .section-body {
+    padding: 18px 20px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .form-group.w2 { flex: 2; min-width: 280px; }
+  .form-group.w3 { flex: 3; min-width: 380px; }
+  .form-group.w-half { flex: 0 0 48%; }
+  .form-group.w-third { flex: 0 0 31%; }
+  .form-group.w-quarter { flex: 0 0 23%; }
+  .form-group.w-full { flex: 0 0 100%; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--pine);
+    box-shadow: 0 0 0 3px rgba(26,107,60,0.1);
+  }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .checkbox-group, .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 6px 0;
+  }
+
+  .checkbox-group label, .radio-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+
+  .checkbox-group label:hover, .radio-group label:hover {
+    background: var(--pine-light);
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--pine);
+    width: 15px; height: 15px;
+    cursor: pointer;
+  }
+
+  .subsection-title {
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--pine);
+    margin: 16px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--pine-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .subsection-title:first-child { margin-top: 0; }
+
+  /* Loan type top checkboxes */
+  .loan-type-bar {
+    background: var(--pine-light);
+    padding: 12px 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--pine-mid);
+  }
+
+  .loan-type-bar label {
+    text-transform: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pine-dark);
+    letter-spacing: 0;
+  }
+
+  /* Trade reference tables */
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 12.5px;
+  }
+
+  .ref-table th {
+    background: var(--pine);
+    color: white;
+    padding: 8px 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .ref-table td {
+    padding: 4px 6px;
+    border: 1px solid var(--border);
+  }
+
+  .ref-table td input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 6px 4px;
+    font-size: 12.5px;
+  }
+
+  .ref-table td input:focus {
+    background: var(--pine-light);
+    box-shadow: none;
+    border-radius: 3px;
+  }
+
+  .ref-table tr:nth-child(even) { background: var(--row-alt); }
+
+  /* Approval table */
+  .approval-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+
+  .approval-table th {
+    background: var(--pine);
+    color: white;
+    padding: 8px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .approval-table td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+
+  .approval-table tr:nth-child(even) { background: var(--row-alt); }
+
+  .inline-note {
+    font-size: 10.5px;
+    color: var(--text-light);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  .photo-box {
+    width: 120px;
+    height: 140px;
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-box:hover { border-color: var(--pine); }
+  .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+
+  .updates-area {
+    background: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .consent-text {
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--text);
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--pine-light);
+    border-radius: 6px;
+    border: 1px solid var(--pine-mid);
+    margin-bottom: 14px;
+  }
+
+  .sig-row {
+    display: flex;
+    gap: 30px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sig-block {
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+  }
+
+  .sig-line {
+    border-bottom: 1.5px solid var(--text);
+    margin-bottom: 4px;
+    min-height: 36px;
+  }
+
+  .sig-label {
+    font-size: 10.5px;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  /* Footnotes */
+  .footnotes {
+    font-size: 10px;
+    color: var(--text-light);
+    line-height: 1.6;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: #fafbfa;
+  }
+
+  /* Toast notification */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--pine-dark);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Print styles */
+  @media print {
+    .app-header, .header-actions, .btn { display: none !important; }
+    .form-container { margin: 0; padding: 0; max-width: 100%; }
+    .form-card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    body { font-size: 11px; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .app-header { flex-direction: column; gap: 12px; text-align: center; }
+    .header-actions { flex-wrap: wrap; justify-content: center; }
+    .form-row { flex-direction: column; gap: 10px; }
+    .form-group.w2, .form-group.w3, .form-group.w-half,
+    .form-group.w-third, .form-group.w-quarter { flex: 0 0 100%; min-width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="logo-group">
+    <div class="logo-circle">RB</div>
+    <div>
+      <h1>Rural Bank of Calbayog City, Inc.</h1>
+      <div class="subtitle">Standard Business Loan Application Form — RBL006</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-excel" onclick="exportToExcel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      Save to Excel
+    </button>
+    <button class="btn btn-pdf" onclick="exportToPDF()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+      Save to PDF
+    </button>
+    <button class="btn btn-print" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print
+    </button>
+    <button class="btn btn-clear" onclick="clearForm()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Clear
+    </button>
+    <button class="btn btn-sheets" id="btnSheets" onclick="submitToSheets()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+      Submit to Sheets
+    </button>
+  </div>
+</div>
+
+<div class="form-container" id="formContent">
+
+  <!-- META -->
+  <div class="form-meta">
+    <span class="form-code">RBL006</span>
+    <span class="form-rev">Rev. No. 1 / Rev. Date: 05/24/2024</span>
+  </div>
+
+  <!-- ===================== LOAN TYPE & PHOTO ===================== -->
+  <div class="form-card">
+    <div class="loan-type-bar">
+      <label><input type="checkbox" id="loanNew" name="loanType" value="New Loan"> New Loan</label>
+      <label><input type="checkbox" id="loanAdditional" name="loanType" value="Additional Loan"> Additional Loan</label>
+      <label><input type="checkbox" id="loanReloan" name="loanType" value="Re-Loan"> Re-Loan</label>
+      <label><input type="checkbox" id="loanRenewal" name="loanType" value="Renewal"> Renewal</label>
+      <label><input type="checkbox" id="loanRestructuring" name="loanType" value="Restructuring"> Restructuring</label>
+    </div>
+    <div class="section-body" style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+      <div style="flex:1;min-width:280px;">
+        <div style="font-size:12px;margin-bottom:8px;color:var(--text-light);">In case of loan renewal or restructuring, are there any updates from previous submission?</div>
+        <div class="radio-group" style="margin-bottom:8px;">
+          <label><input type="radio" name="hasUpdates" value="Yes" onchange="document.getElementById('updatesArea').style.display='block'"> Yes</label>
+          <label><input type="radio" name="hasUpdates" value="No" onchange="document.getElementById('updatesArea').style.display='none'"> No</label>
+        </div>
+        <div class="updates-area" id="updatesArea">
+          <label>Details of Updates</label>
+          <textarea id="updateDetails" rows="3" placeholder="Kindly provide details of updates..."></textarea>
+        </div>
+      </div>
+      <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
+        <span id="photoLabel">PHOTO<br><span style="font-size:9px;font-weight:400;">Click to upload</span></span>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+      </div>
+    </div>
+
+    <!-- SECTION A -->
+    <div class="section-header">
+      <span class="badge">A</span> BORROWER AND BUSINESS INFORMATION
+    </div>
+    <div class="section-body">
+
+      <div class="section-header" style="background:none;color:var(--pine);padding:0;font-size:12.5px;border-bottom:2px solid var(--pine-light);padding-bottom:6px;margin-bottom:12px;">
+        Individual / Sole-Proprietorship
+        <span style="font-size:10.5px;font-weight:400;color:var(--text-light);margin-left:8px;">(Please mark the appropriate boxes and indicate N/A if not applicable)</span>
+      </div>
+
+      <div class="radio-group" style="margin-bottom:14px;">
+        <label><input type="checkbox" id="typeIndividual" value="Individual"> Individual</label>
+        <label><input type="checkbox" id="typeSoleProp" value="Sole-Proprietorship"> Sole-Proprietorship</label>
+      </div>
+
+      <!-- Name of Borrower -->
+      <div class="subsection-title">Name of Borrower</div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" id="bFirstName"></div>
+        <div class="form-group"><label>Middle Name</label><input type="text" id="bMiddleName"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="bLastName"></div>
+        <div class="form-group" style="max-width:100px;"><label>Suffix</label><input type="text" id="bSuffix" placeholder="Jr., Sr."></div>
+      </div>
+
+      <!-- Civil Status, DOB, etc -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Civil Status</label>
+          <select id="bCivilStatus">
+            <option value="">— Select —</option>
+            <option>Single</option>
+            <option>Married</option>
+            <option>Widow/er</option>
+            <option>Annulled</option>
+            <option>Separated</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="bDOB"></div>
+        <div class="form-group w2"><label>Place of Birth (Municipality/City, Province)</label><input type="text" id="bPOB"></div>
+        <div class="form-group">
+          <label>Sex</label>
+          <select id="bSex">
+            <option value="">— Select —</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Citizenship</label><input type="text" id="bCitizenship" value="Filipino"></div>
+      </div>
+
+      <!-- Spouse -->
+      <div class="subsection-title">Name of Spouse</div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" id="spFirstName"></div>
+        <div class="form-group"><label>Middle Name</label><input type="text" id="spMiddleName"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="spLastName"></div>
+        <div class="form-group" style="max-width:100px;"><label>Suffix</label><input type="text" id="spSuffix"></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="spDOB"></div>
+      </div>
+
+      <!-- Home Address -->
+      <div class="subsection-title">Home Address</div>
+      <div class="form-row">
+        <div class="form-group w3">
+          <label>Full Address (Unit #, Bldg/House #, Street, Subdivision/Barangay/District, Municipality/City, Province, Zip Code)</label>
+          <input type="text" id="bHomeAddress">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Home Address Ownership</label>
+          <select id="bHomeOwnership">
+            <option value="">— Select —</option>
+            <option>Owned (unencumbered)</option>
+            <option>Owned (mortgaged)</option>
+            <option>Rented</option>
+            <option>Living with relatives</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Length of Stay</label><input type="text" id="bLengthStay" placeholder="e.g. 5 years"></div>
+        <div class="form-group"><label>Landline No.</label><input type="tel" id="bLandline" placeholder="(area)-number"></div>
+        <div class="form-group"><label>Mobile No.</label><input type="tel" id="bMobile"></div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="bEmail"></div>
+      </div>
+
+      <!-- IDs -->
+      <div class="form-row">
+        <div class="form-group"><label>TIN</label><input type="text" id="bTIN"></div>
+        <div class="form-group"><label>PhilSys</label><input type="text" id="bPhilSys"></div>
+        <div class="form-group w2"><label>Other Government-issued ID (type/number)</label><input type="text" id="bOtherID"></div>
+      </div>
+
+      <!-- Mother's Maiden Name -->
+      <div class="subsection-title">Mother's Maiden Name</div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" id="mFirstName"></div>
+        <div class="form-group"><label>Middle Name</label><input type="text" id="mMiddleName"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="mLastName"></div>
+        <div class="form-group" style="max-width:100px;"><label>Suffix</label><input type="text" id="mSuffix"></div>
+      </div>
+
+      <!-- Business Information -->
+      <div class="subsection-title" style="margin-top:24px;">Business Information</div>
+      <div class="form-row">
+        <div class="form-group w3"><label>Registered Business Name (Trade Name)</label><input type="text" id="bizName"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group w3">
+          <label>Principal Business Address (Unit #, Bldg/House #, Street, Subdivision/Brgy/District, Municipality/City, Province, Zip Code)</label>
+          <input type="text" id="bizAddress">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Same as Home Address?</label>
+          <select id="bizSameHome">
+            <option>No</option>
+            <option>Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Business Address Ownership</label>
+          <select id="bizAddressOwnership">
+            <option value="">— Select —</option>
+            <option>Owned (unencumbered)</option>
+            <option>Owned (mortgaged)</option>
+            <option>Rented</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Years in Operation</label><input type="number" id="bizYears" min="0"></div>
+        <div class="form-group"><label>Number of Branches</label><input type="number" id="bizBranches" min="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group w2"><label>Website / Social Media (Business)</label><input type="text" id="bizWebsite"></div>
+        <div class="form-group">
+          <label>Business has:</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="bizFemMgr"> Female Manager/s</label>
+            <label><input type="checkbox" id="bizFemHead"> Female Head Officer</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Nature of Business (PSIC)</label><input type="text" id="bizNature"></div>
+        <div class="form-group w2"><label>Business Activity</label><input type="text" id="bizActivity"></div>
+      </div>
+
+      <!-- Business Registration -->
+      <div class="subsection-title">Business Registration</div>
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th style="width:25%;">Registration Type</th>
+            <th style="width:20%;">Date of Registration</th>
+            <th style="width:20%;">Expiry Date</th>
+            <th style="width:25%;">Registration Number</th>
+            <th style="width:10%;">Check</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>DTI</td><td><input type="date" id="regDTIDate"></td><td><input type="date" id="regDTIExpiry"></td><td><input type="text" id="regDTINum"></td><td style="text-align:center;"><input type="checkbox" id="regDTI"></td></tr>
+          <tr><td>BIR</td><td><input type="date" id="regBIRDate"></td><td><input type="date" id="regBIRExpiry"></td><td><input type="text" id="regBIRNum"></td><td style="text-align:center;"><input type="checkbox" id="regBIR"></td></tr>
+          <tr><td>Barangay/Mayor's Permit</td><td><input type="date" id="regPermitDate"></td><td><input type="date" id="regPermitExpiry"></td><td><input type="text" id="regPermitNum"></td><td style="text-align:center;"><input type="checkbox" id="regPermit"></td></tr>
+          <tr><td><input type="text" id="regOtherType" placeholder="Others (specify)"></td><td><input type="date" id="regOtherDate"></td><td><input type="date" id="regOtherExpiry"></td><td><input type="text" id="regOtherNum"></td><td style="text-align:center;"><input type="checkbox" id="regOther"></td></tr>
+        </tbody>
+      </table>
+
+      <!-- Firm Size -->
+      <div class="subsection-title" style="margin-top:18px;">Firm Size & Employees</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Firm Size (Total assets excl. land)</label>
+          <select id="firmSize">
+            <option value="">— Select —</option>
+            <option>Micro (not more than Php 3M)</option>
+            <option>Small (Php 3,000,001 to 15M)</option>
+            <option>Medium (Php 15,000,001 to 100M)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Annual Sales or Revenue (Php)</label><input type="text" id="annualSales" placeholder="0.00"></div>
+        <div class="form-group"><label>Full-time Employees</label><input type="number" id="empFulltime" min="0"></div>
+        <div class="form-group"><label>Part-time / Contractual</label><input type="number" id="empParttime" min="0"></div>
+      </div>
+
+      <!-- Trade References -->
+      <div class="subsection-title" style="margin-top:18px;">Top Trade References — Suppliers</div>
+      <table class="ref-table">
+        <thead><tr><th>Name of Top Suppliers</th><th>Goods Supplied / Services Rendered</th><th>Contact Person</th><th>Contact Number</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" id="sup1Name"></td><td><input type="text" id="sup1Goods"></td><td><input type="text" id="sup1Contact"></td><td><input type="text" id="sup1Phone"></td></tr>
+          <tr><td><input type="text" id="sup2Name"></td><td><input type="text" id="sup2Goods"></td><td><input type="text" id="sup2Contact"></td><td><input type="text" id="sup2Phone"></td></tr>
+          <tr><td><input type="text" id="sup3Name"></td><td><input type="text" id="sup3Goods"></td><td><input type="text" id="sup3Contact"></td><td><input type="text" id="sup3Phone"></td></tr>
+        </tbody>
+      </table>
+
+      <div class="subsection-title" style="margin-top:14px;">Top Trade References — Customers</div>
+      <table class="ref-table">
+        <thead><tr><th>Name of Top Customers</th><th>Goods Purchased / Services Availed</th><th>Contact Person</th><th>Contact Number</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" id="cust1Name"></td><td><input type="text" id="cust1Goods"></td><td><input type="text" id="cust1Contact"></td><td><input type="text" id="cust1Phone"></td></tr>
+          <tr><td><input type="text" id="cust2Name"></td><td><input type="text" id="cust2Goods"></td><td><input type="text" id="cust2Contact"></td><td><input type="text" id="cust2Phone"></td></tr>
+          <tr><td><input type="text" id="cust3Name"></td><td><input type="text" id="cust3Goods"></td><td><input type="text" id="cust3Contact"></td><td><input type="text" id="cust3Phone"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footnotes">
+      1/ Additional borrower information may be obtained using a separate sheet/form: co-borrower, dependents, PEP and FATCA questionnaire.
+      2/ This information will solely be used to monitor business ownership/management. Responses will not affect assessment of your loan application.
+      3/ Subject to bank verification. 4/ Firm size is collected for BSP monitoring purposes. 5/ As may be applicable.
+    </div>
+  </div>
+
+  <!-- ===================== SECTION B: LOAN APPLICATION ===================== -->
+  <div class="form-card">
+    <div class="section-header">
+      <span class="badge">B</span> LOAN APPLICATION INFORMATION
+    </div>
+    <div class="section-body">
+      <div class="form-row">
+        <div class="form-group w2"><label>Loan Amount Applied For (Php)</label><input type="text" id="loanAmount" placeholder="0.00"></div>
+        <div class="form-group"><label>Tenor (months)</label><input type="number" id="loanTenor" min="1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Proposed Frequency of Repayment</label>
+          <select id="repayFreq">
+            <option value="">— Select —</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+            <option>Quarterly</option>
+            <option>Annually</option>
+            <option>Lump Sum</option>
+            <option>Others</option>
+          </select>
+        </div>
+        <div class="form-group"><label>If Others, specify</label><input type="text" id="repayOther"></div>
+      </div>
+
+      <div class="subsection-title">Loan Facility</div>
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="facLoan"> Loan</label>
+        <label><input type="checkbox" id="facCreditLine"> Credit Line</label>
+        <label><input type="checkbox" id="facTermLoan"> Term Loan</label>
+        <label><input type="checkbox" id="facOther"> Others</label>
+      </div>
+      <div class="form-group" style="max-width:300px;margin-top:6px;"><input type="text" id="facOtherSpec" placeholder="Specify other facility"></div>
+
+      <div class="subsection-title">Loan Purpose</div>
+      <div class="checkbox-group" style="margin-bottom:10px;">
+        <label><input type="checkbox" id="purpWC"> Working Capital</label>
+        <label><input type="checkbox" id="purpExpand"> Business Expansion</label>
+        <label><input type="checkbox" id="purpConstruct"> Construction/Development of Real Estate</label>
+        <label><input type="checkbox" id="purpEquip"> Purchase of Equipment/Motor Vehicles</label>
+        <label><input type="checkbox" id="purpRE"> Acquisition of Real Estate</label>
+        <label><input type="checkbox" id="purpBio"> Purchase of Biological Asset</label>
+        <label><input type="checkbox" id="purpTakeout"> Loan Takeout/Refinancing</label>
+        <label><input type="checkbox" id="purpOther"> Others</label>
+      </div>
+      <div class="form-group" style="max-width:300px;"><input type="text" id="purpOtherSpec" placeholder="Specify other purpose"></div>
+
+      <div class="subsection-title">Type of Loan</div>
+      <div class="radio-group">
+        <label><input type="radio" name="loanSecType" value="Unsecured" id="loanUnsecured"> Unsecured Loan</label>
+        <label><input type="radio" name="loanSecType" value="Secured" id="loanSecured"> Secured Loan</label>
+      </div>
+      <div id="securedDetails" style="margin-top:10px;">
+        <label style="margin-bottom:8px;">If secured, collateral/s and/or surety/ies offered:</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="colRE"> Real Estate (land, building)</label>
+          <label><input type="checkbox" id="colMovable"> Movable Property</label>
+          <label><input type="checkbox" id="colReceivables"> Receivables & Claims</label>
+          <label><input type="checkbox" id="colIP"> Intellectual Property</label>
+          <label><input type="checkbox" id="colTitle"> Title Documents</label>
+          <label><input type="checkbox" id="colEquip"> Equipment</label>
+          <label><input type="checkbox" id="colFinAssets"> Financial Assets</label>
+          <label><input type="checkbox" id="colInventory"> Inventory</label>
+          <label><input type="checkbox" id="colGuarantee"> Third Party Guarantee/Suretyship</label>
+          <label><input type="checkbox" id="colOther"> Others</label>
+        </div>
+        <div class="form-group" style="max-width:300px;margin-top:6px;"><input type="text" id="colOtherSpec" placeholder="Specify other collateral"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SECTION C: FINANCIAL INFORMATION ===================== -->
+  <div class="form-card">
+    <div class="section-header">
+      <span class="badge">C</span> FINANCIAL INFORMATION
+    </div>
+    <div class="section-body">
+      <div class="subsection-title">Source of Funds for Repayment of Loans</div>
+      <div class="checkbox-group" style="margin-bottom:14px;">
+        <label><input type="checkbox" id="srcRevenue"> Revenue</label>
+        <label><input type="checkbox" id="srcSavings"> Savings and/or Investment</label>
+        <label><input type="checkbox" id="srcInheritance"> Inheritance</label>
+        <label><input type="checkbox" id="srcAssetSale"> Asset Sale</label>
+        <label><input type="checkbox" id="srcSalary"> Salary/Allowance</label>
+        <label><input type="checkbox" id="srcOther"> Others</label>
+      </div>
+      <div class="form-group" style="max-width:300px;"><input type="text" id="srcOtherSpec" placeholder="Specify other source"></div>
+
+      <!-- Deposit Accounts -->
+      <div class="subsection-title" style="margin-top:18px;">Existing Deposit and E-money Accounts (Top 3)</div>
+      <table class="ref-table">
+        <thead>
+          <tr><th>Name of Financial Institution</th><th>Type of Account</th><th>Year Opened</th><th>Account Ownership</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" id="dep1Inst"></td>
+            <td><select id="dep1Type"><option>Savings</option><option>Checking</option><option>E-wallet</option><option>Others</option></select></td>
+            <td><input type="text" id="dep1Year" placeholder="YYYY"></td>
+            <td><select id="dep1Own"><option>Personal</option><option>Business/Merchant</option></select></td>
+          </tr>
+          <tr>
+            <td><input type="text" id="dep2Inst"></td>
+            <td><select id="dep2Type"><option>Savings</option><option>Checking</option><option>E-wallet</option><option>Others</option></select></td>
+            <td><input type="text" id="dep2Year" placeholder="YYYY"></td>
+            <td><select id="dep2Own"><option>Personal</option><option>Business/Merchant</option></select></td>
+          </tr>
+          <tr>
+            <td><input type="text" id="dep3Inst"></td>
+            <td><select id="dep3Type"><option>Savings</option><option>Checking</option><option>E-wallet</option><option>Others</option></select></td>
+            <td><input type="text" id="dep3Year" placeholder="YYYY"></td>
+            <td><select id="dep3Own"><option>Personal</option><option>Business/Merchant</option></select></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Existing Loans -->
+      <div class="subsection-title" style="margin-top:18px;">Existing Loans (Top 3)</div>
+      <table class="ref-table">
+        <thead>
+          <tr><th>Financial Institution</th><th>Loan Amount</th><th>Date Granted</th><th>Maturity Date</th><th>Outstanding Balance</th><th>Collaterals</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" id="loan1Inst"></td><td><input type="text" id="loan1Amt"></td><td><input type="text" id="loan1Granted" placeholder="mm/yyyy"></td><td><input type="text" id="loan1Maturity" placeholder="mm/yyyy"></td><td><input type="text" id="loan1Balance"></td><td><input type="text" id="loan1Col"></td></tr>
+          <tr><td><input type="text" id="loan2Inst"></td><td><input type="text" id="loan2Amt"></td><td><input type="text" id="loan2Granted" placeholder="mm/yyyy"></td><td><input type="text" id="loan2Maturity" placeholder="mm/yyyy"></td><td><input type="text" id="loan2Balance"></td><td><input type="text" id="loan2Col"></td></tr>
+          <tr><td><input type="text" id="loan3Inst"></td><td><input type="text" id="loan3Amt"></td><td><input type="text" id="loan3Granted" placeholder="mm/yyyy"></td><td><input type="text" id="loan3Maturity" placeholder="mm/yyyy"></td><td><input type="text" id="loan3Balance"></td><td><input type="text" id="loan3Col"></td></tr>
+        </tbody>
+      </table>
+
+      <!-- Credit Cards -->
+      <div class="subsection-title" style="margin-top:18px;">Existing Credit Cards (Top 3)</div>
+      <table class="ref-table">
+        <thead>
+          <tr><th>Financial Institution</th><th>Credit Limit</th><th>Outstanding Balance</th><th>Type of Ownership</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" id="cc1Inst"></td><td><input type="text" id="cc1Limit"></td><td><input type="text" id="cc1Balance"></td><td><select id="cc1Own"><option>Personal</option><option>Business</option></select></td></tr>
+          <tr><td><input type="text" id="cc2Inst"></td><td><input type="text" id="cc2Limit"></td><td><input type="text" id="cc2Balance"></td><td><select id="cc2Own"><option>Personal</option><option>Business</option></select></td></tr>
+          <tr><td><input type="text" id="cc3Inst"></td><td><input type="text" id="cc3Limit"></td><td><input type="text" id="cc3Balance"></td><td><select id="cc3Own"><option>Personal</option><option>Business</option></select></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== SECTION D & E: DECLARATION & PRIVACY ===================== -->
+  <div class="form-card">
+    <div class="section-header">
+      <span class="badge">D</span> UNDERTAKING / DECLARATION
+    </div>
+    <div class="section-body">
+      <div class="consent-text">
+        I/We hereby confirm that all information and supporting documents provided herein are true, accurate and complete and I/we agree to notify the financial institution of any changes in any of the information supplied. The financial institution can withdraw or cancel any loan approval if any major information and supporting documents are found to be materially inaccurate.<br><br>
+        I/We authorize the financial institution to obtain relevant information as it may require concerning this application.<br><br>
+        I/We understand and agree that additional undertaking/declaration, not stated in this form, may be required by the financial institution.<br><br>
+        I/We hereby agree that this application shall be subject to applicable laws (BSP circulars, rules and regulations) and policies of Rural Bank of Calbayog City, Inc (RBCCI).
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="badge">E</span> DATA PRIVACY CONSENT
+    </div>
+    <div class="section-body">
+      <div class="consent-text">
+        In compliance with the requirements of the Data Privacy Act (DPA), I/we hereby authorize and give my/our consent to Rural Bank of Calbayog City, Inc (RBCCI) and its authorized officers on the general use and sharing of information obtained in the course of any transaction/s pursuant to my banking relationship with it. Personal information and sensitive personal information may be collected, processed, stored, updated, or disclosed by the bank:<br><br>
+        a. for legitimate bank-related purposes and requests;<br>
+        b. to implement transactions which the borrower requests, allows, or authorizes;<br>
+        c. to comply with the bank's internal policies and its reporting obligations to government authorities under applicable laws; and<br>
+        d. to offer and provide new or related products and services of the bank, its affiliates and subsidiaries through mail, email, SMS or other means of communication.<br><br>
+        I/We confirm that I/we am/are aware that, in case of unlawful acquisition, inaccuracy, and error, I/we have the right to access, update, dispute, block, or correct certain personal information, or withdraw my/our consent to the use of any information provided herein, subject to the rights and limitations under the DPA.<br><br>
+        I/We understand that this consent shall continue to be in effect for ten (10) years or until expiration of the records retention limits set by applicable banking laws, whichever comes later.<br><br>
+        I/We understand that my/our basic credit data, as well as any regular updates or corrections thereof, are mandated to be submitted to the Credit Information Corporation (CIC) pursuant to R.A. 9150 and its Implementing Rules and Regulations for consolidation and disclosure as may be authorized by the CIC.<br><br>
+        Contact RBCCI Data Protection Officer: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="691b0b0a08050b0810060e0a001d10290e04080005470a0604">[email&#160;protected]</a></strong>
+      </div>
+
+      <div class="sig-row">
+        <div class="sig-block">
+          <div class="form-group"><input type="text" id="sigBorrowerName" placeholder="Printed Name of Borrower"></div>
+          <div class="sig-line"></div>
+          <div class="sig-label">Signature above Printed Name of Borrower</div>
+          <div class="form-group" style="margin-top:6px;"><label>Date</label><input type="date" id="sigBorrowerDate"></div>
+        </div>
+        <div class="sig-block">
+          <div class="form-group"><input type="text" id="sigCoBorrowerName" placeholder="Printed Name of Co-Borrower/Spouse"></div>
+          <div class="sig-line"></div>
+          <div class="sig-label">Signature above Printed Name of Co-Borrower/Spouse</div>
+          <div class="form-group" style="margin-top:6px;"><label>Date</label><input type="date" id="sigCoBorrowerDate"></div>
+        </div>
+      </div>
+
+      <!-- Third party guarantors -->
+      <div class="subsection-title" style="margin-top:20px;">Third Party Credit Guarantor and/or Security Grantor</div>
+      <table class="ref-table">
+        <thead><tr><th>Printed Name</th><th>Affiliation</th><th>Relationship with Borrower</th><th>Contact Information</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" id="guar1Name"></td><td><input type="text" id="guar1Affil"></td><td><input type="text" id="guar1Rel"></td><td><input type="text" id="guar1Contact"></td></tr>
+          <tr><td><input type="text" id="guar2Name"></td><td><input type="text" id="guar2Affil"></td><td><input type="text" id="guar2Rel"></td><td><input type="text" id="guar2Contact"></td></tr>
+          <tr><td><input type="text" id="guar3Name"></td><td><input type="text" id="guar3Affil"></td><td><input type="text" id="guar3Rel"></td><td><input type="text" id="guar3Contact"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== SUMMARY OF LOAN DETAILS (Page 3) ===================== -->
+  <div class="form-card">
+    <div class="section-header">
+      SUMMARY OF LOAN DETAILS
+    </div>
+    <div class="section-body">
+      <div class="form-row">
+        <div class="form-group"><label>Borrower Last Name & Suffix</label><input type="text" id="sumLastName"></div>
+        <div class="form-group"><label>First Name</label><input type="text" id="sumFirstName"></div>
+        <div class="form-group"><label>Middle Name</label><input type="text" id="sumMiddleName"></div>
+        <div class="form-group"><label>Civil Status</label><input type="text" id="sumCivilStatus"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Co-Borrower Last Name & Suffix</label><input type="text" id="sumCoLastName"></div>
+        <div class="form-group"><label>First Name</label><input type="text" id="sumCoFirstName"></div>
+        <div class="form-group"><label>Middle Name</label><input type="text" id="sumCoMiddleName"></div>
+        <div class="form-group"><label>Relation to Primary Borrower</label><input type="text" id="sumCoRelation"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group w2"><label>Loan Amount (In Words and Figures)</label><input type="text" id="sumLoanAmt"></div>
+        <div class="form-group"><label>Term (In Years)</label><input type="text" id="sumTerm"></div>
+        <div class="form-group"><label>Interest Rate (Per Annum)</label><input type="text" id="sumRate"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group w2"><label>Loan Purpose (Specify in Detail)</label><input type="text" id="sumPurpose"></div>
+        <div class="form-group"><label>Industry Classification (2009 PSIC)</label><input type="text" id="sumIndustry"></div>
+      </div>
+
+      <!-- Loan Types and Classifications -->
+      <div class="subsection-title" style="margin-top:18px;">Loan Types and Classifications with Corresponding Risk and Controls</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>A. Loan Creation Type</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumLoanCreation" value="New Loan"> New Loan</label>
+            <label><input type="radio" name="sumLoanCreation" value="Re-loan"> Re-loan</label>
+            <label><input type="radio" name="sumLoanCreation" value="Renewal"> Renewal</label>
+            <label><input type="radio" name="sumLoanCreation" value="Restructure"> Restructure</label>
+          </div>
+          <div class="form-group" style="max-width:200px;margin-top:4px;"><input type="text" id="sumRestructTimes" placeholder="No. of times (if restructure)"></div>
+        </div>
+        <div class="form-group">
+          <label>B. Security Type</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumSecType" value="Unsecured"> Unsecured</label>
+            <label><input type="radio" name="sumSecType" value="Secured"> Secured</label>
+            <label><input type="radio" name="sumSecType" value="Unsecured with attachment"> Unsecured w/ attachment</label>
+          </div>
+          <div class="form-group" style="max-width:200px;margin-top:4px;"><input type="text" id="sumSecTypeSpec" placeholder="Type of security"></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>C. DOSRI Type</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumDOSRI" value="Non-DOSRI"> Non-DOSRI</label>
+            <label><input type="radio" name="sumDOSRI" value="DOSRI"> DOSRI</label>
+            <label><input type="radio" name="sumDOSRI" value="RI"> RI</label>
+          </div>
+          <div class="form-group" style="max-width:200px;margin-top:4px;"><input type="text" id="sumDOSRISpec" placeholder="Type of DOSRI/RI"></div>
+        </div>
+        <div class="form-group">
+          <label>D. AFRD Type</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumAFRD" value="Non-AFRD"> Non-AFRD</label>
+            <label><input type="radio" name="sumAFRD" value="AFRD"> AFRD</label>
+          </div>
+          <div class="form-group" style="max-width:200px;margin-top:4px;"><input type="text" id="sumAFRDSpec" placeholder="Type of AFRD"></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>E. Credit Risk Rating — Result</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumCreditRisk" value="Low"> Low</label>
+            <label><input type="radio" name="sumCreditRisk" value="Medium"> Medium</label>
+            <label><input type="radio" name="sumCreditRisk" value="High"> High</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>F. ESRM</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumESRM" value="Low"> Low</label>
+            <label><input type="radio" name="sumESRM" value="Medium"> Medium</label>
+            <label><input type="radio" name="sumESRM" value="High"> High</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>G. PEP</label>
+          <div class="radio-group">
+            <label><input type="radio" name="sumPEP" value="No"> No</label>
+            <label><input type="radio" name="sumPEP" value="Yes"> Yes</label>
+          </div>
+          <div class="form-group" style="max-width:200px;margin-top:4px;"><input type="text" id="sumPEPSpec" placeholder="Position/Designation"></div>
+        </div>
+      </div>
+
+      <!-- Recommending Approval -->
+      <div class="subsection-title" style="margin-top:18px;">Recommending Approval</div>
+      <div class="form-row">
+        <div class="form-group w2">
+          <div class="sig-line" style="margin-top:30px;"></div>
+          <div class="sig-label">Credit Evaluation Officer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BOD APPROVAL (Page 4) ===================== -->
+  <div class="form-card">
+    <div class="section-header">
+      AUTHORIZED APPROVING AUTHORITIES — Board of Directors
+    </div>
+    <div class="section-body">
+      <table class="approval-table">
+        <thead>
+          <tr><th style="width:5%;">#</th><th style="width:40%;">Name</th><th style="width:30%;">Signature</th><th style="width:25%;">Date Signed</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><input type="text" id="bod1Name" value="ALAN GILES MARY S. SARMIENTO"></td><td></td><td><input type="date" id="bod1Date"></td></tr>
+          <tr><td>2</td><td><input type="text" id="bod2Name" value="MA. ROSARIO R. SANTOS"></td><td></td><td><input type="date" id="bod2Date"></td></tr>
+          <tr><td>3</td><td><input type="text" id="bod3Name" value="ALFRED DENNIS B. ANCHETA"></td><td></td><td><input type="date" id="bod3Date"></td></tr>
+          <tr><td>4</td><td><input type="text" id="bod4Name" value="REYNALDO M. PRUDENCIADO, JR."></td><td></td><td><input type="date" id="bod4Date"></td></tr>
+          <tr><td>5</td><td><input type="text" id="bod5Name" value="JOMARI JESS S. ABELLAR"></td><td></td><td><input type="date" id="bod5Date"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Photo preview
+function previewPhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const box = document.getElementById('photoBox');
+      document.getElementById('photoLabel').style.display = 'none';
+      let img = box.querySelector('img');
+      if (!img) { img = document.createElement('img'); box.appendChild(img); }
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Clear form
+function clearForm() {
+  if (!confirm('Clear all form data? This cannot be undone.')) return;
+  document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea').forEach(el => {
+    if (!el.id.startsWith('bod')) el.value = '';
+  });
+  document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => el.checked = false);
+  document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  document.getElementById('updatesArea').style.display = 'none';
+  const img = document.querySelector('#photoBox img');
+  if (img) img.remove();
+  document.getElementById('photoLabel').style.display = '';
+  showToast('Form cleared successfully');
+}
+
+// ==================== COLLECT ALL FORM DATA ====================
+function collectFormData() {
+  const gv = id => {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    if (el.type === 'checkbox') return el.checked ? '✓' : '';
+    return el.value || '';
+  };
+  const gr = name => {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    return checked ? checked.value : '';
+  };
+
+  return {
+    // Loan Type
+    'Loan Type - New': gv('loanNew'),
+    'Loan Type - Additional': gv('loanAdditional'),
+    'Loan Type - Re-Loan': gv('loanReloan'),
+    'Loan Type - Renewal': gv('loanRenewal'),
+    'Loan Type - Restructuring': gv('loanRestructuring'),
+    'Updates from Previous': gr('hasUpdates'),
+    'Update Details': gv('updateDetails'),
+    'Borrower Type - Individual': gv('typeIndividual'),
+    'Borrower Type - Sole Prop': gv('typeSoleProp'),
+
+    // Borrower Info
+    'Borrower First Name': gv('bFirstName'),
+    'Borrower Middle Name': gv('bMiddleName'),
+    'Borrower Last Name': gv('bLastName'),
+    'Borrower Suffix': gv('bSuffix'),
+    'Civil Status': gv('bCivilStatus'),
+    'Date of Birth': gv('bDOB'),
+    'Place of Birth': gv('bPOB'),
+    'Sex': gv('bSex'),
+    'Citizenship': gv('bCitizenship'),
+
+    // Spouse
+    'Spouse First Name': gv('spFirstName'),
+    'Spouse Middle Name': gv('spMiddleName'),
+    'Spouse Last Name': gv('spLastName'),
+    'Spouse Suffix': gv('spSuffix'),
+    'Spouse Date of Birth': gv('spDOB'),
+
+    // Address
+    'Home Address': gv('bHomeAddress'),
+    'Home Ownership': gv('bHomeOwnership'),
+    'Length of Stay': gv('bLengthStay'),
+    'Landline No': gv('bLandline'),
+    'Mobile No': gv('bMobile'),
+    'Email': gv('bEmail'),
+    'TIN': gv('bTIN'),
+    'PhilSys': gv('bPhilSys'),
+    'Other Govt ID': gv('bOtherID'),
+
+    // Mother
+    'Mother First Name': gv('mFirstName'),
+    'Mother Middle Name': gv('mMiddleName'),
+    'Mother Last Name': gv('mLastName'),
+    'Mother Suffix': gv('mSuffix'),
+
+    // Business
+    'Business Name': gv('bizName'),
+    'Business Address': gv('bizAddress'),
+    'Same as Home': gv('bizSameHome'),
+    'Business Address Ownership': gv('bizAddressOwnership'),
+    'Years in Operation': gv('bizYears'),
+    'Number of Branches': gv('bizBranches'),
+    'Business Website': gv('bizWebsite'),
+    'Female Manager': gv('bizFemMgr'),
+    'Female Head Officer': gv('bizFemHead'),
+    'Nature of Business': gv('bizNature'),
+    'Business Activity': gv('bizActivity'),
+
+    // Registration
+    'DTI Registered': gv('regDTI'),
+    'DTI Date': gv('regDTIDate'),
+    'DTI Expiry': gv('regDTIExpiry'),
+    'DTI Number': gv('regDTINum'),
+    'BIR Registered': gv('regBIR'),
+    'BIR Date': gv('regBIRDate'),
+    'BIR Expiry': gv('regBIRExpiry'),
+    'BIR Number': gv('regBIRNum'),
+    'Permit Registered': gv('regPermit'),
+    'Permit Date': gv('regPermitDate'),
+    'Permit Expiry': gv('regPermitExpiry'),
+    'Permit Number': gv('regPermitNum'),
+    'Other Reg Type': gv('regOtherType'),
+    'Other Reg Date': gv('regOtherDate'),
+    'Other Reg Expiry': gv('regOtherExpiry'),
+    'Other Reg Number': gv('regOtherNum'),
+
+    // Firm
+    'Firm Size': gv('firmSize'),
+    'Annual Sales': gv('annualSales'),
+    'Full-time Employees': gv('empFulltime'),
+    'Part-time Employees': gv('empParttime'),
+
+    // Suppliers
+    'Supplier 1 Name': gv('sup1Name'), 'Supplier 1 Goods': gv('sup1Goods'), 'Supplier 1 Contact': gv('sup1Contact'), 'Supplier 1 Phone': gv('sup1Phone'),
+    'Supplier 2 Name': gv('sup2Name'), 'Supplier 2 Goods': gv('sup2Goods'), 'Supplier 2 Contact': gv('sup2Contact'), 'Supplier 2 Phone': gv('sup2Phone'),
+    'Supplier 3 Name': gv('sup3Name'), 'Supplier 3 Goods': gv('sup3Goods'), 'Supplier 3 Contact': gv('sup3Contact'), 'Supplier 3 Phone': gv('sup3Phone'),
+
+    // Customers
+    'Customer 1 Name': gv('cust1Name'), 'Customer 1 Goods': gv('cust1Goods'), 'Customer 1 Contact': gv('cust1Contact'), 'Customer 1 Phone': gv('cust1Phone'),
+    'Customer 2 Name': gv('cust2Name'), 'Customer 2 Goods': gv('cust2Goods'), 'Customer 2 Contact': gv('cust2Contact'), 'Customer 2 Phone': gv('cust2Phone'),
+    'Customer 3 Name': gv('cust3Name'), 'Customer 3 Goods': gv('cust3Goods'), 'Customer 3 Contact': gv('cust3Contact'), 'Customer 3 Phone': gv('cust3Phone'),
+
+    // Loan Application
+    'Loan Amount': gv('loanAmount'),
+    'Tenor (months)': gv('loanTenor'),
+    'Repayment Frequency': gv('repayFreq'),
+    'Repayment Other': gv('repayOther'),
+    'Facility - Loan': gv('facLoan'),
+    'Facility - Credit Line': gv('facCreditLine'),
+    'Facility - Term Loan': gv('facTermLoan'),
+    'Facility - Other': gv('facOtherSpec'),
+    'Purpose - Working Capital': gv('purpWC'),
+    'Purpose - Expansion': gv('purpExpand'),
+    'Purpose - Construction': gv('purpConstruct'),
+    'Purpose - Equipment': gv('purpEquip'),
+    'Purpose - Real Estate': gv('purpRE'),
+    'Purpose - Biological Asset': gv('purpBio'),
+    'Purpose - Takeout': gv('purpTakeout'),
+    'Purpose - Other': gv('purpOtherSpec'),
+    'Loan Security Type': gr('loanSecType'),
+    'Collateral - Real Estate': gv('colRE'),
+    'Collateral - Movable': gv('colMovable'),
+    'Collateral - Receivables': gv('colReceivables'),
+    'Collateral - IP': gv('colIP'),
+    'Collateral - Title Docs': gv('colTitle'),
+    'Collateral - Equipment': gv('colEquip'),
+    'Collateral - Financial Assets': gv('colFinAssets'),
+    'Collateral - Inventory': gv('colInventory'),
+    'Collateral - Guarantee': gv('colGuarantee'),
+    'Collateral - Other': gv('colOtherSpec'),
+
+    // Financial
+    'Source - Revenue': gv('srcRevenue'),
+    'Source - Savings': gv('srcSavings'),
+    'Source - Inheritance': gv('srcInheritance'),
+    'Source - Asset Sale': gv('srcAssetSale'),
+    'Source - Salary': gv('srcSalary'),
+    'Source - Other': gv('srcOtherSpec'),
+
+    // Deposits
+    'Deposit 1 Institution': gv('dep1Inst'), 'Deposit 1 Type': gv('dep1Type'), 'Deposit 1 Year': gv('dep1Year'), 'Deposit 1 Ownership': gv('dep1Own'),
+    'Deposit 2 Institution': gv('dep2Inst'), 'Deposit 2 Type': gv('dep2Type'), 'Deposit 2 Year': gv('dep2Year'), 'Deposit 2 Ownership': gv('dep2Own'),
+    'Deposit 3 Institution': gv('dep3Inst'), 'Deposit 3 Type': gv('dep3Type'), 'Deposit 3 Year': gv('dep3Year'), 'Deposit 3 Ownership': gv('dep3Own'),
+
+    // Existing Loans
+    'Existing Loan 1 Institution': gv('loan1Inst'), 'Existing Loan 1 Amount': gv('loan1Amt'), 'Existing Loan 1 Granted': gv('loan1Granted'), 'Existing Loan 1 Maturity': gv('loan1Maturity'), 'Existing Loan 1 Balance': gv('loan1Balance'), 'Existing Loan 1 Collateral': gv('loan1Col'),
+    'Existing Loan 2 Institution': gv('loan2Inst'), 'Existing Loan 2 Amount': gv('loan2Amt'), 'Existing Loan 2 Granted': gv('loan2Granted'), 'Existing Loan 2 Maturity': gv('loan2Maturity'), 'Existing Loan 2 Balance': gv('loan2Balance'), 'Existing Loan 2 Collateral': gv('loan2Col'),
+    'Existing Loan 3 Institution': gv('loan3Inst'), 'Existing Loan 3 Amount': gv('loan3Amt'), 'Existing Loan 3 Granted': gv('loan3Granted'), 'Existing Loan 3 Maturity': gv('loan3Maturity'), 'Existing Loan 3 Balance': gv('loan3Balance'), 'Existing Loan 3 Collateral': gv('loan3Col'),
+
+    // Credit Cards
+    'CC 1 Institution': gv('cc1Inst'), 'CC 1 Limit': gv('cc1Limit'), 'CC 1 Balance': gv('cc1Balance'), 'CC 1 Ownership': gv('cc1Own'),
+    'CC 2 Institution': gv('cc2Inst'), 'CC 2 Limit': gv('cc2Limit'), 'CC 2 Balance': gv('cc2Balance'), 'CC 2 Ownership': gv('cc2Own'),
+    'CC 3 Institution': gv('cc3Inst'), 'CC 3 Limit': gv('cc3Limit'), 'CC 3 Balance': gv('cc3Balance'), 'CC 3 Ownership': gv('cc3Own'),
+
+    // Signatures
+    'Borrower Signatory Name': gv('sigBorrowerName'),
+    'Borrower Signatory Date': gv('sigBorrowerDate'),
+    'Co-Borrower Signatory Name': gv('sigCoBorrowerName'),
+    'Co-Borrower Signatory Date': gv('sigCoBorrowerDate'),
+
+    // Guarantors
+    'Guarantor 1 Name': gv('guar1Name'), 'Guarantor 1 Affiliation': gv('guar1Affil'), 'Guarantor 1 Relationship': gv('guar1Rel'), 'Guarantor 1 Contact': gv('guar1Contact'),
+    'Guarantor 2 Name': gv('guar2Name'), 'Guarantor 2 Affiliation': gv('guar2Affil'), 'Guarantor 2 Relationship': gv('guar2Rel'), 'Guarantor 2 Contact': gv('guar2Contact'),
+    'Guarantor 3 Name': gv('guar3Name'), 'Guarantor 3 Affiliation': gv('guar3Affil'), 'Guarantor 3 Relationship': gv('guar3Rel'), 'Guarantor 3 Contact': gv('guar3Contact'),
+
+    // Summary
+    'Summary Borrower Last Name': gv('sumLastName'),
+    'Summary Borrower First Name': gv('sumFirstName'),
+    'Summary Borrower Middle Name': gv('sumMiddleName'),
+    'Summary Civil Status': gv('sumCivilStatus'),
+    'Summary Co-Borrower Last Name': gv('sumCoLastName'),
+    'Summary Co-Borrower First Name': gv('sumCoFirstName'),
+    'Summary Co-Borrower Middle Name': gv('sumCoMiddleName'),
+    'Summary Co-Borrower Relation': gv('sumCoRelation'),
+    'Summary Loan Amount': gv('sumLoanAmt'),
+    'Summary Term': gv('sumTerm'),
+    'Summary Interest Rate': gv('sumRate'),
+    'Summary Loan Purpose': gv('sumPurpose'),
+    'Summary Industry': gv('sumIndustry'),
+    'Loan Creation Type': gr('sumLoanCreation'),
+    'Restructure Times': gv('sumRestructTimes'),
+    'Summary Security Type': gr('sumSecType'),
+    'Summary Security Spec': gv('sumSecTypeSpec'),
+    'DOSRI Type': gr('sumDOSRI'),
+    'DOSRI Spec': gv('sumDOSRISpec'),
+    'AFRD Type': gr('sumAFRD'),
+    'AFRD Spec': gv('sumAFRDSpec'),
+    'Credit Risk Rating': gr('sumCreditRisk'),
+    'ESRM': gr('sumESRM'),
+    'PEP': gr('sumPEP'),
+    'PEP Spec': gv('sumPEPSpec'),
+
+    // BOD
+    'BOD 1 Name': gv('bod1Name'), 'BOD 1 Date': gv('bod1Date'),
+    'BOD 2 Name': gv('bod2Name'), 'BOD 2 Date': gv('bod2Date'),
+    'BOD 3 Name': gv('bod3Name'), 'BOD 3 Date': gv('bod3Date'),
+    'BOD 4 Name': gv('bod4Name'), 'BOD 4 Date': gv('bod4Date'),
+    'BOD 5 Name': gv('bod5Name'), 'BOD 5 Date': gv('bod5Date'),
+  };
+}
+
+// ==================== EXPORT TO EXCEL ====================
+function exportToExcel() {
+  const data = collectFormData();
+  const borrowerName = data['Borrower Last Name'] || data['Borrower First Name'] || 'Borrower';
+
+  // Create workbook with multiple sheets
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Full Form Data (Field | Value)
+  const sheetData = [
+    ['RBCCI — Standard Business Loan Application Form (RBL006)'],
+    ['Date Exported', new Date().toLocaleDateString()],
+    [''],
+    ['Field', 'Value']
+  ];
+  for (const [key, val] of Object.entries(data)) {
+    sheetData.push([key, val]);
+  }
+  const ws1 = XLSX.utils.aoa_to_sheet(sheetData);
+  ws1['!cols'] = [{ wch: 35 }, { wch: 60 }];
+  // Header styling
+  ws1['A1'] = { v: 'RBCCI — Standard Business Loan Application Form (RBL006)', t: 's' };
+  XLSX.utils.book_append_sheet(wb, ws1, 'Loan Application');
+
+  // Sheet 2: Summary
+  const sumData = [
+    ['LOAN SUMMARY'],
+    [''],
+    ['Borrower', `${data['Borrower Last Name']}, ${data['Borrower First Name']} ${data['Borrower Middle Name']}`],
+    ['Civil Status', data['Civil Status']],
+    ['Business Name', data['Business Name']],
+    ['Loan Amount', data['Loan Amount']],
+    ['Tenor', `${data['Tenor (months)']} months`],
+    ['Repayment Frequency', data['Repayment Frequency']],
+    ['Security Type', data['Loan Security Type']],
+    ['Firm Size', data['Firm Size']],
+    ['Annual Sales', data['Annual Sales']],
+    ['Credit Risk Rating', data['Credit Risk Rating']],
+    ['ESRM', data['ESRM']],
+    ['DOSRI', data['DOSRI Type']],
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(sumData);
+  ws2['!cols'] = [{ wch: 25 }, { wch: 50 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Summary');
+
+  const filename = `SBLAF_${borrowerName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`;
+  XLSX.writeFile(wb, filename);
+  showToast(`✓ Saved to Excel: ${filename}`);
+}
+
+// ==================== EXPORT TO PDF ====================
+function exportToPDF() {
+  const data = collectFormData();
+  const borrowerName = data['Borrower Last Name'] || data['Borrower First Name'] || 'Borrower';
+  const filename = `SBLAF_${borrowerName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+
+  showToast('Generating PDF...');
+
+  const element = document.getElementById('formContent');
+  const opt = {
+    margin: [8, 8, 8, 8],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    showToast(`✓ Saved to PDF: ${filename}`);
+  });
+}
+
+// Auto-populate summary from Section A fields
+document.addEventListener('input', function(e) {
+  const id = e.target.id;
+  if (id === 'bLastName') document.getElementById('sumLastName').value = e.target.value;
+  if (id === 'bFirstName') document.getElementById('sumFirstName').value = e.target.value;
+  if (id === 'bMiddleName') document.getElementById('sumMiddleName').value = e.target.value;
+  if (id === 'bCivilStatus') document.getElementById('sumCivilStatus').value = e.target.value;
+  if (id === 'bFirstName') document.getElementById('sumFirstName').value = e.target.value;
+  if (id === 'loanAmount') document.getElementById('sumLoanAmt').value = e.target.value;
+  if (id === 'loanTenor') document.getElementById('sumTerm').value = e.target.value;
+});
+
+// ==================== GOOGLE SHEETS SUBMIT ====================
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwGEXfecbpWNBb93sW7suXJ3kBOMeraxLHcl4XkYFVhjxHAl65vGT9mGNNZINea1BmxHA/exec'; // ← paste your SBLAF Web App URL here
+
+async function submitToSheets() {
+  const btn = document.getElementById('btnSheets');
+  btn.classList.add('loading');
+  btn.textContent = 'Submitting...';
+
+  try {
+    const data = collectFormData();
+    data['Submission Timestamp'] = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
+
+    const response = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.result === 'success') {
+      showToast('✓ Successfully submitted to Google Sheets!');
+    } else {
+      showToast('✗ Submission failed: ' + result.message);
+    }
+  } catch (err) {
+    showToast('✗ Network error — check your connection or Sheet URL');
+    console.error(err);
+  } finally {
+    btn.classList.remove('loading');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg> Submit to Sheets`;
+  }
+}
+
+</script>
+
+<!-- TOAST -->
+<div id="toast" style="
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1a6b3c;color:#fff;padding:11px 24px;border-radius:8px;
+  font-size:13px;font-weight:600;opacity:0;pointer-events:none;
+  transition:all 0.3s;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.2);
+  white-space:nowrap;
+"></div>
+
+<script>
+// Wire toast to show class
+const _toastEl = document.getElementById('toast');
+const _origShowToast = showToast;
+document.getElementById('toast').style.transition = 'opacity 0.3s, transform 0.3s';
+// Patch showToast to use opacity
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 3500);
+};
+</script>
+
+</body>
+</html>
